@@ -11,6 +11,9 @@ import re
 import threading
 import time
 from striprtf.striprtf import rtf_to_text
+import iptcinfo3
+
+logging.getLogger('iptcinfo').setLevel(logging.ERROR)
 
 parser = argparse.ArgumentParser(
     description='Download all articles from bib Bertem')
@@ -113,19 +116,21 @@ def downloadArticlePdf(articleId):
             print('Not authenticated, please make sure you are logged in and have an arbitrary article open')
             exit_flag = True
             return
-        if decoded.startswith('<html><head><title>Download error</title></head>'):
+        if decoded.startswith('<html><head><title>Download error</title></head>') or decoded == 'Article not found : Article not found':
             return
         filename = buildFilename(rtf_to_text(decoded).split('\n'))
         if filename == 'unknown':
             exit_flag = True
             return
-        exists = checkDownloadedArticles(filename)
+        exists = checkDownloadedArticles(articleId)
         if (not args.force_all and not args.force_check and exists):
             exit_flag = True
         elif (args.force_all or not exists):
-            path = '{}\\{}'.format(args.directory, filename)
+            path = os.path.join(args.directory, filename)
             with open(path, 'wb') as f:
                 f.write(text)
+            info = iptcinfo3.IPTCInfo(path)
+            info['keywords'] = [articleId]
     del req
 
 
@@ -141,9 +146,12 @@ def handleFoundArticle(query):
     return article_id
 
 
-def checkDownloadedArticles(filename):
+def checkDownloadedArticles(articleId):
     global args
-    return os.path.isfile('{}\\{}'.format(args.directory, filename))
+    for f in os.listdir(args.directory):
+        info = iptcinfo3.IPTCInfo(os.path.join(args.directory, f))
+        if articleId in info['keywords']:
+            return True 
 
 
 def buildFilename(rtf):
@@ -219,7 +227,11 @@ def getArticleList(searchInput):
     global max_pages
     url = 'https://bertem.bibliotheek.be/krantenarchief?q={}'.format(
         searchInput.replace(',', '%2C'))
-    max_pages = getMaxPages(url)
+    try:
+        max_pages = getMaxPages(url)
+    except:
+        print('No results for the search input')
+        return
     for x in range(max_pages + 1):
         while threads.__len__() >= 10:
             time.sleep(0.5)
