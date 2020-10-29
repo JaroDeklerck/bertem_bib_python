@@ -18,13 +18,15 @@ logging.getLogger('iptcinfo').setLevel(logging.ERROR)
 version = 1.1
 update_needed = False
 with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_python/main/version') as response:
-    if float(response.read().decode('utf-8')) > version:
+    new_version = float(response.read().decode('utf-8'))
+    print('Local version: {} - Online version: {}'.format(version, new_version))
+    if new_version > version:
         print('Newer version found -> Updating')
         update_needed = True
 if update_needed:
     with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_python/main/downloadArticles.py') as response:
         with open('downloadArticles.py', 'w') as f:
-            f.write(response.read().decode('utf-8'))
+            f.write(response.read().decode('cp347'))
             print('Updated, please rerun the application')
 
 
@@ -82,7 +84,7 @@ class myThread (threading.Thread):
       finished_pages += 1
       printProgressBar(finished_pages, max_pages, prefix=' Progress:', suffix='Complete')
 
-def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '█', printEnd = "\r"):
+def printProgressBar (iteration, total, prefix = '', suffix = '', decimals = 1, length = 100, fill = '\u2588', printEnd = "\r"):
     """
     Call in a loop to create terminal progress bar
     @params:
