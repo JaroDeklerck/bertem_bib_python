@@ -15,6 +15,19 @@ import iptcinfo3
 
 logging.getLogger('iptcinfo').setLevel(logging.ERROR)
 
+version = 1.1
+update_needed = False
+with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_python/main/version') as response:
+    if float(response.read().decode('utf-8')) > version:
+        print('Newer version found -> Updating')
+        update_needed = True
+if update_needed:
+    with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_python/main/downloadArticles.py') as response:
+        with open('downloadArticles.py', 'w') as f:
+            f.write(response.read().decode('utf-8'))
+            print('Updated, please rerun the application')
+
+
 parser = argparse.ArgumentParser(
     description='Download all articles from bib Bertem')
 # parser.add_argument('username')
