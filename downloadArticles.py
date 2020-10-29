@@ -15,7 +15,7 @@ import iptcinfo3
 
 logging.getLogger('iptcinfo').setLevel(logging.ERROR)
 
-version = 1.1
+version = 1.3
 update_needed = False
 with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_python/main/version') as response:
     new_version = float(response.read().decode('utf-8'))
@@ -23,11 +23,14 @@ with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_
     if new_version > version:
         print('Newer version found -> Updating')
         update_needed = True
+    else:
+        print('No new version found -> running as normal')
 if update_needed:
     with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_python/main/downloadArticles.py') as response:
         with open('downloadArticles.py', 'w') as f:
             f.write(response.read().decode('utf-8'))
-            print('Updated, please rerun the application')
+            print('Updated, rerunning the application')
+            os.execv(sys.executable,[sys.executable.split("/")[-1]]+list(map(lambda s: s.replace('"', '\\"'), sys.argv)))
 
 
 parser = argparse.ArgumentParser(
