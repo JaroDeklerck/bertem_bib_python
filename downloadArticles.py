@@ -26,7 +26,7 @@ with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_
 if update_needed:
     with request.urlopen('https://raw.githubusercontent.com/JaroDeklerck/bertem_bib_python/main/downloadArticles.py') as response:
         with open('downloadArticles.py', 'w') as f:
-            f.write(response.read().decode('cp347'))
+            f.write(response.read().decode('utf-8'))
             print('Updated, please rerun the application')
 
 
@@ -201,7 +201,7 @@ def buildFilename(rtf):
                 page = 'unknown'
         source = re.sub('[ /]', '-', source_date.split(' - ')[0]).replace('*', '')
         date = datetime.datetime.strptime(source_date.split(' - ')[-1].replace('.', ''), '%d %b %Y').strftime('%Y%m%d')
-        chars = re.escape('":?.;=+~[]{}<>“”*()‘')
+        chars = re.escape('":?.;=+~[]{}<>��*()�')
         title = re.sub('[{}]'.format(chars), '', re.sub('[ /]', '-', title_text))
         if page != 'unknown':
             return '{}_{}_{}_{}.rtf'.format(date, source, page, title)
