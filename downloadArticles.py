@@ -49,7 +49,7 @@ parser.add_argument(
     help='Directory name for the articles (default is search input)',
     default='default_to_be_replaced')
 
-parser.add_argument('-l', '--logging', help='Filename for logging', default='log')
+parser.add_argument('-l', '--logging', help='Filename for logging', default='downloader.log')
 
 args = parser.parse_args()
 
@@ -299,6 +299,8 @@ def getArticleList(searchInput):
     while any(t.is_alive() for t in threads):
         printProgressBar(finished_articles, max_articles, prefix=' Progress:', suffix='Complete')
         time.sleep(1)
+    printProgressBar(max_articles, max_articles, prefix=' Progress:', suffix='Complete')
+
 
 
 try:

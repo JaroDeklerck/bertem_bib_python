@@ -2,4 +2,6 @@ rtf/
 .vscode/
 test.py
 properties
-log
+*.log
+*.xlsx
+*.zip
